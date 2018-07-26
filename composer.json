@@ -1,5 +1,5 @@
 {
-    "name": "dirtsimple/mantle",
+    "name": "dirtsimple/mantle-site",
     "type": "project",
     "license": "MIT",
     "description": "Literate DevOps for Wordpress",
@@ -19,7 +19,7 @@
         "wp"
     ],
     "support": {
-        "issues": "https://github.com/dirtsimple/mantle/issues"
+        "issues": "https://github.com/dirtsimple/mantle-site/issues"
     },
     "config": {
         "preferred-install": "dist"
@@ -33,7 +33,7 @@
     "require": {
         "php": ">=7.1",
         "composer/installers": "^1.5",
-        "johnpbloch/wordpress": "4.9.4",
+        "johnpbloch/wordpress": "4.9.7",
         "oscarotero/env": "^1.1.0",
         "roots/wp-password-bcrypt": "1.0.0"
     },

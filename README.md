@@ -1,12 +1,18 @@
 # Literate DevOps for Wordpress
 
-Mantle is a [bedrock](https://github.com/roots/bedrock)-inspired, [imposer](https://github.com/dirtsimple/imposer) and [postmark](https://github.com/dirtsimple/postmark)-based, composer-oriented, docker-compose runtime environment for Wordpress development, built on [doco](https://github.com/bashup/doco), [.devkit](https://github.com/bashup/.devkit), and [dirtsimple/php-server](https://github.com/dirtsimple/php-server).
+Mantle is a bedrock-inspired, [imposer](https://github.com/dirtsimple/imposer) and [postmark](https://github.com/dirtsimple/postmark)-based, composer-oriented, docker-compose runtime environment for revision-controlled Wordpress development, deployment, and content management.
+
+This specific repository is the part of Mantle that runs inside a docker container: like [bedrock](https://github.com/roots/bedrock), it exists only to provide a starting point for your individual project's code.  But unlike bedrock, it includes within its layout a starting version of your [imposer-project.md](imposer-project.md) and directories for [state files](https://github.com/dirtsimple/imposer#how-state-modules-work) and [markdown content](https://github.com/dirtsimple/postmark#readme) that can be revision-controlled alongside your `composer.json`, static content, custom theme, etc.
+
+Within an overall Mantle project, you can have one or more Mantle "sites" (Wordpress instances), creating fresh projects via e.g. `composer create-project dirtsimple/mantle-site dev` to initialize your dev site, then adding the necessary configuration to the enclosing Mantle project directory to create and run a container for it, and route web traffic to it via Traefik, an nginx proxy, or direct port mapping.
+
+After you've created your dev site, you can turn it into a git repository, then create staging or production sites by cloning that repository, either manually or automatically (e.g. by setting the right environment for the other containers to auto-clone on creation).  When your containers start up, they'll automatically apply any state or content changes they find in the file system, transparently synchronizing changes to the database across the relevant sites.
 
 ### State and Content Management
 
-In addition to being a convenient template for Wordpress projects, Mantle is designed to work with [imposer](https://github.com/dirtsimple/imposer)  and [postmark](https://github.com/dirtsimple/postmark), automatically running `imposer apply` at container start to apply Wordpress configuration from your project source and environment variables, and `wp postmark tree content` to sync Wordpress content from Markdown files with YAML front matter.
+In addition to being a convenient template for Wordpress projects, Mantle is designed to work with [imposer](https://github.com/dirtsimple/imposer) and [postmark](https://github.com/dirtsimple/postmark), automatically running `imposer apply` at container start to apply Wordpress configuration from your project source and environment variables, and `wp postmark tree content` to sync Wordpress content from Markdown files with YAML front matter.
 
-(You can also manually run these commands to sync files at other times, or run `script/watch` to watch them for changes and apply them to the development DB.)
+(You can also manually run these commands to sync files at other times, or enable file watching on your development site to automatically sync with the database as you edit them.)
 
 #### State Modules
 
@@ -22,35 +28,6 @@ See the [imposer documentation](https://github.com/dirtsimple/imposer) for more 
 
 Any `*.md` files in the project's `content/` directory (or any subdirectory thereof) are automatically synced to create Wordpress posts or pages, converting Markdown to HTML for the post body, and using YAML front matter to set metadata like tags, dates, etc.  See the [postmark documentation](https://github.com/dirtsimple/postmark) for more details, and/or `wp help postmark`.
 
-### Requirements and Installation
-
-To run Mantle, you'll need git, docker, [jq](https://stedolan.github.io/jq/) 1.5+, and [docker-compose](https://docs.docker.com/compose/), on a machine with bash 4.  ([direnv](https://direnv.net/) is also highly recommended, but not strictly required: without it, you'll need to manually source the `.envrc` in your project directory to be able to access the `doco` and `dk` tools, among others.)
-
-To begin using it, simply:
-
-```bash
-$ git clone https://github.com/dirtsimple/mantle myproject
-$ cd myproject
-$ script/setup
-```
-
-This will initialize the project, creating `myproject/.env` and various `myproject/deploy/*.env` files.  Review and edit these files to make sure that things are configured to your needs.
-
-The most critical settings are in the main `myproject/.env` file, where you will need to:
-
-* Set the URLs for your dev, stage, and prod environments
-* Determine how those URLs will be routed to their containers (e.g. via port mapping, or a reverse proxy such as [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) or [Traefik](https://docs.traefik.io/)), and
-* Decide whether you'll be using a project-specific mysql server (the default), or a shared one
-
-Once you've configured your project, you can then:
-
-```bash
-$ doco dev dba mkuser   # make a dev user w/generated password and db access
-$ doco dev up -d        # create and start the dev container
-```
-
-(Note: if you're not using direnv and don't have doco installed globally, you'll need to `source .envrc` in a subshell to add project tools like `doco` to your `PATH`.  This will also override `wp` and `composer` with scripts that run those commands inside the development container, i.e. by aliasing them to `doco wp` and `doco composer`.)
-
 ### Project Status
 
-This project is in active development and lacks end-user documentation other than this file.  For developer documentation, see the [Configuration](Mantle.doco.md), [Commands](Commands.md), [state modules](https://github.com/dirtsimple/imposer#how-state-modules-work) and [content files](https://github.com/dirtsimple/postmark#readme) docs, along with the [Mantle state file](imposer/Mantle.state.md).
+This site template is fairly stable; most future changes should revolve around updating Wordpress or other dependencies, or minor additions to the default [Mantle state file](imposer/Mantle.state.md).  This should make it easy to update your project-specific repositories with changes as needed.
