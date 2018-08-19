@@ -2,7 +2,7 @@
 
 ### Automatic DB Initialization
 
-If working with a new database, the Wordpress core may need to be installed, and sample data deleted.  This is done automatically upon `imposer apply`.   (Note that the active container needs to have `WP_ADMIN_USER`, `WP_ADMIN_EMAIL`, and `WP_ADMIN_PASS` environment variables set in order to perform an install.)
+If working with a new database, the Wordpress core may need to be installed, and sample data deleted.  This is done automatically upon `imposer apply`.   (Note that to perform an install, the active container needs to have a `WP_ADMIN_EMAIL` variable defined.  `WP_ADMIN_USER` and `WP_ADMIN_PASS` can optionally be set as well; if not defined, random values are generated, used, and echoed to the docker logs so you can find out what they are.)
 
 ```shell
 event on "before_apply" mantle-initdb
@@ -10,9 +10,11 @@ event on "before_apply" mantle-initdb
 mantle-initdb() {
 	mantle-is-installed && return
 	mantle-db-exists || wp db create
+	[[ ${WP_ADMIN_USER-} ]]  || echo "Admin ID: ${WP_ADMIN_USER:=$(openssl rand -base64 6)}"
+	[[ ${WP_ADMIN_PASS-} ]]  || echo "Password: ${WP_ADMIN_PASS:=$(openssl rand -base64 9)}"
 	wp core install --skip-email --url="$WP_HOME" --title="Placeholder" \
 		--admin_user="$WP_ADMIN_USER" --admin_email="$WP_ADMIN_EMAIL" \
-		${WP_ADMIN_PASS:+--admin_password="$WP_ADMIN_PASS"}
+		--admin_password="$WP_ADMIN_PASS"
 	wp post delete 1 2 --force   # delete placeholder posts
 }
 
