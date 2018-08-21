@@ -1,6 +1,6 @@
 *.env
 imposer/.cache/
-vendor/
+vendor/*
 !vendor/.gitkeep
 
 public/ext/mu-plugins/*/
