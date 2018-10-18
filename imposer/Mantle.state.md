@@ -15,7 +15,7 @@ mantle-initdb() {
 	wp core install --skip-email --url="$WP_HOME" --title="Placeholder" \
 		--admin_user="$WP_ADMIN_USER" --admin_email="$WP_ADMIN_EMAIL" \
 		--admin_password="$WP_ADMIN_PASS"
-	wp post delete 1 2 --force   # delete placeholder posts
+	wp post delete 1 2 3 --force   # delete placeholder posts
 }
 
 mantle-db-command() { mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" "$@"; }
