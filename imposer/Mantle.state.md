@@ -35,16 +35,18 @@ postmark-content "content"
 
 ### Wordpress Tweaks
 
-#### Post GUIDs
+#### Post + Attachment GUIDs
 
 To avoid changing post guids between dev, staging, and prod, we use proper UUID URNs as guids.  (This also avoids potential leakage of non-public URLs in RSS feeds.)
 
 ```php tweak
-add_filter( 'wp_insert_post_data', function ( $data, $postarr ) {
+function generate_proper_guid_for_post( $data, $postarr ) {
 	if ( '' === $data['guid'] ) {
 		$data['guid'] = wp_slash( 'urn:uuid:' . wp_generate_uuid4() );
 	}
 	return $data;
-}, 10, 2 );
+}
+add_filter( 'wp_insert_post_data',       'generate_proper_guid_for_post', 10, 2 );
+add_filter( 'wp_insert_attachment_data', 'generate_proper_guid_for_post', 10, 2 );
 ```
 
