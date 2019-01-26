@@ -10,6 +10,7 @@ public/ext/uploads/*
 
 !public/ext/plugins/.gitkeep
 !public/ext/uploads/.gitkeep
+!public/ext/uploads/public
 
 public/wp
 public/.htaccess
