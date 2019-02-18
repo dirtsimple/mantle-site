@@ -9,7 +9,9 @@ event on "before_apply" mantle-initdb
 
 mantle-initdb() {
 	mantle-is-installed && return
-	mantle-db-exists || wp db create
+	mantle-db-exists || event emit "mantle create db"
+	event emit "mantle install db"
+	mantle-is-installed && return
 	[[ ${WP_ADMIN_USER-} ]]  || echo "Admin ID: ${WP_ADMIN_USER:=$(openssl rand -base64 6)}"
 	[[ ${WP_ADMIN_PASS-} ]]  || echo "Password: ${WP_ADMIN_PASS:=$(openssl rand -base64 9)}"
 	wp core install --skip-email --url="$WP_HOME" --title="Placeholder" \
@@ -22,6 +24,24 @@ mantle-db-command() { mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NA
 mantle-db-query() { echo "$@" | mantle-db-command; }
 mantle-is-installed() { mantle-db-query "SHOW CREATE TABLE ${DB_PREFIX-wp_}options" >/dev/null 2>&1; }
 mantle-db-exists() { mantle-db-query >/dev/null 2>&1; }
+```
+
+#### Loading From A Snapshot
+
+If a new database needs to be created, and an `imposer/snapshot.sql` or `imposer/snapshot.sql.gz` file exists, it’s loaded into the newly-created database.
+
+```shell
+event on "mantle create db" mantle-create-db
+
+mantle-create-db() {
+	wp db create
+	set -- imposer/snapshot.sql
+	if [[ -f "$1" ]]; then
+		mantle-db-command <"$1"
+	elif [[ -f "$1.gz" ]]; then
+		gunzip -c "$1.gz" | mantle-db-command
+	fi
+}
 ```
 
 ### Postmark Integration
