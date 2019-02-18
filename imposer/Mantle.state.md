@@ -1,5 +1,27 @@
 ## Tweaks and Extensions for Mantle Projects
 
+### Environment-Specific States and Blocks
+
+If the project’s `imposer/` directory contains a `dev.state.md`, `prod.state.md`, etc., it’s automatically loaded when a matching `$WP_ENV` is in effect.
+
+To allow environment-specific blocks of YAML, css, shell, etc., an `if-env` function is supplied.  It takes one or more arguments that are environment names, and can optionally have a first argument of `not` to indicate the block should only be used if the environment is *not* one of the ones listed.
+
+So for example a block tagged `yaml !if-env dev` would only run if `$WP_ENV` equals `dev`, while a block tagged `shell !if-env not prod` would only run if `$WP_ENV` does *not* equal `prod`.
+
+```shell
+if [[ ${WP_ENV-} && -f "$LOCO_ROOT/imposer/$WP_ENV.state.md" ]]; then
+	event on "module_loaded_imposer:project" require "$WP_ENV"
+fi
+
+if-env() {
+	[[ $1 == not ]] || set -- "" "$@"
+	printf -v REPLY '|%q' "${@:2}"
+	echo -n "case \${WP_ENV-} in ${REPLY#|})${1:+ :;; *)}"
+	echo; mdsh-block "$mdsh_lang" "$mdsh_block" "$block_start"; echo
+	echo "esac"
+}
+```
+
 ### Automatic DB Initialization
 
 If working with a new database, the Wordpress core may need to be installed, and sample data deleted.  This is done automatically upon `imposer apply`.   (Note that to perform an install, the active container needs to have a `WP_ADMIN_EMAIL` variable defined.  `WP_ADMIN_USER` and `WP_ADMIN_PASS` can optionally be set as well; if not defined, random values are generated, used, and echoed to the docker logs so you can find out what they are.)
