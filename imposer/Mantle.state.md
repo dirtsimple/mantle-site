@@ -72,7 +72,7 @@ Whenever `imposer apply` is run, we also import content from the `content/` dire
 
 ```shell
 require "dirtsimple/postmark"
-postmark-content "content"
+postmark-module "content"
 ```
 
 ### Wordpress Tweaks
