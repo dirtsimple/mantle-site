@@ -10,7 +10,7 @@ So for example a block tagged `yaml !if-env dev` would only run if `$WP_ENV` equ
 
 ```shell
 if [[ ${WP_ENV-} && -f "$LOCO_ROOT/imposer/$WP_ENV.state.md" ]]; then
-	event on "module_loaded_imposer:project" require "$WP_ENV"
+	event on "module loaded imposer:project" require "$WP_ENV"
 fi
 
 if-env() {
