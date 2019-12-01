@@ -22,6 +22,15 @@ if-env() {
 }
 ```
 
+### `pull` command
+
+A quick way to apply updates in production.
+
+
+```shell
+imposer.pull() { git pull && composer install && exec imposer apply; }
+```
+
 ### Automatic DB Initialization
 
 If working with a new database, the Wordpress core may need to be installed, and sample data deleted.  This is done automatically upon `imposer apply`.   (Note that to perform an install, the active container needs to have a `WP_ADMIN_EMAIL` variable defined.  `WP_ADMIN_USER` and `WP_ADMIN_PASS` can optionally be set as well; if not defined, random values are generated, used, and echoed to the docker logs so you can find out what they are.)
